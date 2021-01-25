@@ -11,58 +11,61 @@ namespace CarForSale.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class FornecedoresController : ControllerBase
+    public class CarrosController : ControllerBase
     {
         private readonly ApiDbContext _context;
 
-        public FornecedoresController(ApiDbContext context)
+        public CarrosController(ApiDbContext context)
         {
             _context = context;
         }
 
         
         [HttpGet]
-        public IEnumerable<Fornecedor> GetFornecedores()
+        public IEnumerable<Carro> GetCarro()
         {
-            return _context.Fornecedores;
+            return _context.Carro;
         }
 
+        
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetFornecedor([FromRoute] Guid id)
+        public async Task<IActionResult> GetCarro([FromRoute] Guid id)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var fornecedor = await _context.Fornecedores.FindAsync(id);
+            var carro = await _context.Carro.FindAsync(id);
 
-            if (fornecedor == null)
+            if (carro == null)
             {
                 return NotFound();
             }
 
-            return Ok(fornecedor);
+            return Ok(carro);
         }
 
         
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutFornecedor([FromRoute] Guid id, [FromBody] Fornecedor fornecedor)
+        public async Task<IActionResult> PutCarro([FromRoute] Guid id, [FromBody] Carro carro)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (id != fornecedor.Id)
+            if (id != carro.Id)
             {
                 return BadRequest();
             }
 
-            if (FornecedorVazio(fornecedor))
+            if (CarroVazio(carro))
+            {
                 return BadRequest();
+            }
 
-            _context.Entry(fornecedor).State = EntityState.Modified;
+            _context.Entry(carro).State = EntityState.Modified;
 
             try
             {
@@ -70,7 +73,7 @@ namespace CarForSale.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!FornecedorExists(id))
+                if (!CarroExists(id))
                 {
                     return NotFound();
                 }
@@ -83,59 +86,64 @@ namespace CarForSale.Controllers
             return NoContent();
         }
 
-       
         [HttpPost]
-        public async Task<IActionResult> PostFornecedor([FromBody] Fornecedor fornecedor)
+        public async Task<IActionResult> PostCarro([FromBody] Carro carro)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (FornecedorVazio(fornecedor))
+            if (CarroVazio(carro))
+            {
                 return BadRequest();
+            } 
 
-            _context.Fornecedores.Add(fornecedor);
+            _context.Carro.Add(carro);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetFornecedor", new { id = fornecedor.Id }, fornecedor);
+            return CreatedAtAction("GetCarro", new { id = carro.Id }, carro);
         }
 
-        
+        // DELETE: api/Carros/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteFornecedor([FromRoute] Guid id)
+        public async Task<IActionResult> DeleteCarro([FromRoute] Guid id)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var fornecedor = await _context.Fornecedores.FindAsync(id);
-            if (fornecedor == null)
+            var carro = await _context.Carro.FindAsync(id);
+            if (carro == null)
             {
                 return NotFound();
             }
 
-            _context.Fornecedores.Remove(fornecedor);
+            _context.Carro.Remove(carro);
             await _context.SaveChangesAsync();
 
-            return Ok(fornecedor);
+            return Ok(carro);
         }
 
-        private bool FornecedorVazio(Fornecedor fornecedor)
-        {
-            if (fornecedor.Nome == null || fornecedor.Codigo == null)
+        private bool CarroVazio(Carro carro)
+        {            
+            if (carro.Modelo == null || carro.Motor == null || carro.Tipo == null || carro.Cor == null)
+            {
                 return true;
-
-            if (fornecedor.Nome == "" || fornecedor.Codigo == "")
+            }
+               
+            if (carro.Modelo == "" || carro.Motor == "" || carro.Tipo == "" || carro.Cor == "")
+            {
                 return true;
+            }
 
             return false;
+                        
         }
-
-        private bool FornecedorExists(Guid id)
+        private bool CarroExists(Guid id)
         {
-            return _context.Fornecedores.Any(e => e.Id == id);
+            return _context.Carro.Any(e => e.Id == id);
         }
     }
 }

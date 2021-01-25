@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CarForSale.Model;
 
 namespace CarForSale.Model
 {
@@ -14,5 +15,7 @@ namespace CarForSale.Model
         }
 
         public DbSet<Fornecedor> Fornecedores { get; set; }
+
+        public DbSet<CarForSale.Model.Carro> Carro { get; set; }
     }
 }
