@@ -16,6 +16,7 @@ namespace CarForSale.Model
 
         public DbSet<Fornecedor> Fornecedores { get; set; }
 
-        public DbSet<CarForSale.Model.Carro> Carro { get; set; }
+        public DbSet<Carro> Carros { get; set; }
+        
     }
 }

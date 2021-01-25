@@ -17,5 +17,7 @@ namespace CarForSale.Model
         public string Tipo { get; set; }
         public string Motor { get; set; }
 
+        public string CodigoFornecedor { get; set; }
+
     }
 }
