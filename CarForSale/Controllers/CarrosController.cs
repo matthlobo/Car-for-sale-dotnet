@@ -31,6 +31,8 @@ namespace CarForSale.Controllers
         [HttpGet("{CodigoFornecedor}")]
         public async Task<IActionResult> GetCarrosAssociados([FromRoute] string CodigoFornecedor)        
         {
+            //var carrosAssociados = _context.Carros.Where(c => c.Fornecedor.Codigo == c.CodigoFornecedor);
+
             var carrosAssociados = _context.Carros;
             var fornecedorAssociado =  _context.Fornecedores.Join(carrosAssociados,
                 f => f.Codigo,
@@ -43,7 +45,7 @@ namespace CarForSale.Controllers
                     motor = c.Motor,
                     NomeFornecedor = f.Nome,
                     codigoFornecedor = f.Codigo
-                }).Where(c => c.codigoFornecedor == CodigoFornecedor);       
+                }).Where(c => c.codigoFornecedor == CodigoFornecedor);
 
             
             return Ok(fornecedorAssociado);
@@ -69,23 +71,21 @@ namespace CarForSale.Controllers
         }
 
         // PUT: api/Carros/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCarro([FromRoute] Guid id, [FromBody] Carro carro)
+        [HttpPut]
+        public async Task<IActionResult> PutCarro([FromBody] Carro carro)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (id != carro.Id)
-            {
-                return BadRequest();
-            }
-
-            if (CarroVazio(carro))
-            {
-                return BadRequest();
-            }
+            //if (id != carro.Id)
+            //{
+            //    return BadRequest();
+            //}
+                      
+            
+            //carro.Id = id;
 
             _context.Entry(carro).State = EntityState.Modified;
 
@@ -95,7 +95,7 @@ namespace CarForSale.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CarroExists(id))
+                if (!CarroExists(carro.Id))
                 {
                     return NotFound();
                 }

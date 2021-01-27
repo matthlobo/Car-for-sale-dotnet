@@ -90,6 +90,11 @@ namespace CarForSale.Controllers
                 return BadRequest(ModelState);
             }
 
+            if (MotoVazia(moto))
+            {
+                return BadRequest();
+            }
+
             _context.Motos.Add(moto);
             await _context.SaveChangesAsync();
 
@@ -115,6 +120,22 @@ namespace CarForSale.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(moto);
+        }
+
+        private bool MotoVazia(Moto moto)
+        {
+            if (moto.Modelo == null || moto.Motor == null || moto.Tipo == null || moto.Cor == null)
+            {
+                return true;
+            }
+
+            if (moto.Modelo == "" || moto.Motor == "" || moto.Tipo == "" || moto.Cor == "")
+            {
+                return true;
+            }
+
+            return false;
+
         }
 
         private bool MotoExists(Guid id)
