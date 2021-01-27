@@ -129,7 +129,7 @@ namespace CarForSale.Controllers
 
             if (fornecedor.Nome == "" || fornecedor.Codigo == "")
                 return true;
-
+            
             return false;
         }
 

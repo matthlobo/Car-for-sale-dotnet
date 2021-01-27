@@ -6,18 +6,10 @@ using System.Threading.Tasks;
 
 namespace CarForSale.Model
 {
-    public class Carro 
+    public class Carro : AutomovelBase
     {
-       [Key]
-       public Guid Id { get; set; }
-
-        [Required(ErrorMessage = "O Campo {0} é obrigatório!")]
-        public string Modelo { get; set; }
-        public string Cor { get; set; }
-        public string Tipo { get; set; }
-        public string Motor { get; set; }
-
-        public string CodigoFornecedor { get; set; }
+       [Required(ErrorMessage = "Você precisa informar a quantidade de litros do porta malas")]
+       public string LitrosPortaMalas { get; set; }
 
     }
 }

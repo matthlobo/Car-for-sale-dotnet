@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CarForSale.Model;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace CarForSale.Controllers
 {
@@ -25,6 +26,27 @@ namespace CarForSale.Controllers
         public IEnumerable<Carro> GetCarros()
         {
             return _context.Carros;
+        }
+
+        [HttpGet("{CodigoFornecedor}")]
+        public async Task<IActionResult> GetCarrosAssociados([FromRoute] string CodigoFornecedor)        
+        {
+            var carrosAssociados = _context.Carros;
+            var fornecedorAssociado =  _context.Fornecedores.Join(carrosAssociados,
+                f => f.Codigo,
+                c => c.CodigoFornecedor,
+                (f, c) => new
+                {
+                    modelo = c.Modelo,
+                    cor = c.Cor,
+                    tipo = c.Tipo,
+                    motor = c.Motor,
+                    NomeFornecedor = f.Nome,
+                    codigoFornecedor = f.Codigo
+                }).Where(c => c.codigoFornecedor == CodigoFornecedor);       
+
+            
+            return Ok(fornecedorAssociado);
         }
 
         // GET: api/Carros/5
