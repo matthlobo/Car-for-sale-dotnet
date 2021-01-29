@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CarForSale.Model;
+using Newtonsoft.Json;
+using System.Net;
 
 namespace CarForSale.Controllers
 {
@@ -47,15 +49,15 @@ namespace CarForSale.Controllers
         }
 
         // PUT: api/Clientes/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCliente([FromRoute] Guid id, [FromBody] Cliente cliente)
+        [HttpPut]
+        public async Task<IActionResult> PutCliente([FromBody] Cliente cliente)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (id != cliente.Id)
+            if (cliente.Id != cliente.Id)
             {
                 return BadRequest();
             }
@@ -68,7 +70,7 @@ namespace CarForSale.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ClienteExists(id))
+                if (!ClienteExists(cliente.Id))
                 {
                     return NotFound();
                 }
@@ -79,7 +81,7 @@ namespace CarForSale.Controllers
             }
 
             return NoContent();
-        }
+        }       
 
         // POST: api/Clientes
         [HttpPost]
@@ -89,6 +91,13 @@ namespace CarForSale.Controllers
             {
                 return BadRequest(ModelState);
             }
+
+            var clienteExistente = _context.Clientes.Any(c => c.Cpf == cliente.Cpf);
+                       
+            if(clienteExistente)
+            {               
+                return BadRequest(JsonConvert.SerializeObject(new { mensagem = "O CPF já está cadastrado." }));
+            }                       
 
             _context.Clientes.Add(cliente);
             await _context.SaveChangesAsync();
