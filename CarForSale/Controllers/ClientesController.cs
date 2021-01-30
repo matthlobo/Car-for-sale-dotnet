@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using CarForSale.Model;
 using Newtonsoft.Json;
 using System.Net;
+using System.Reflection;
 
 namespace CarForSale.Controllers
 {
@@ -24,14 +25,14 @@ namespace CarForSale.Controllers
 
         // GET: api/Clientes
         [HttpGet]
-        public IEnumerable<Cliente> GetClientes()
+        public IEnumerable<Cliente> Get()
         {
             return _context.Clientes;
         }
 
         // GET: api/Clientes/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetCliente([FromRoute] Guid id)
+        public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
             if (!ModelState.IsValid)
             {
@@ -50,8 +51,8 @@ namespace CarForSale.Controllers
 
         // PUT: api/Clientes/5
         [HttpPut]
-        public async Task<IActionResult> PutCliente([FromBody] Cliente cliente)
-        {
+        public async Task<IActionResult> Put([FromBody] Cliente cliente)
+        {            
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -85,7 +86,7 @@ namespace CarForSale.Controllers
 
         // POST: api/Clientes
         [HttpPost]
-        public async Task<IActionResult> PostCliente([FromBody] Cliente cliente)
+        public async Task<IActionResult> Post([FromBody] Cliente cliente)
         {
             if (!ModelState.IsValid)
             {
@@ -107,7 +108,7 @@ namespace CarForSale.Controllers
 
         // DELETE: api/Clientes/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCliente([FromRoute] Guid id)
+        public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
             if (!ModelState.IsValid)
             {
@@ -124,6 +125,46 @@ namespace CarForSale.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(cliente);
+        }
+
+        [HttpPatch]
+        public async Task<IActionResult> Patch([FromBody] ClientePatch clientePatch)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var cliente = await _context.Clientes.FindAsync(clientePatch.Id);
+            if (cliente == null)
+            {
+                return NotFound();
+            }
+
+            AtualizarDadosPorReflection(clientePatch, cliente);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        private void AtualizarDadosPorReflection(ClientePatch clientePatch, Cliente cliente)
+        {
+            var clientePatchProperties = clientePatch.GetType().GetProperties().Where(x => x.Name != nameof(clientePatch.Id));
+            var clienteProperties = cliente.GetType().GetProperties();
+
+            foreach (var property in clientePatchProperties)
+            {
+                var propertyValue = property.GetValue(clientePatch);
+
+                if (propertyValue != null)
+                {                    
+                    var clienteProperty = clienteProperties.FirstOrDefault(x => x.Name == property.Name);
+                    if (clienteProperty != null)
+                    {
+                        clienteProperty.SetValue(cliente, propertyValue);
+                    }
+                }
+            }
         }
 
         private bool ClienteExists(Guid id)
