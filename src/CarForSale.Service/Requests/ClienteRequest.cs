@@ -1,31 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace CarForSale.Model
+namespace CarForSale.Service.Requests
 {
-    public class Cliente
+    public class ClienteRequest
     {
-        [Key]
-        public Guid Id { get; set; }
-
         [Required(ErrorMessage = "O Campo {0} é obrigatório!")]
         public string Cpf { get; set; }
 
         [Required(ErrorMessage = "O Campo {0} é obrigatório!")]
-        public string Nome { get; set; }
-
-        [Required(ErrorMessage = "O Campo {0} é obrigatório!")]
-        public string Sobrenome { get; set; }
+        public string NomeCompleto { get; set; }
 
         [Required(ErrorMessage = "O Campo {0} é obrigatório!")]
         public string Email { get; set; }
 
         [Required(ErrorMessage = "O Campo {0} é obrigatório!")]
         public string Senha { get; set; }
-
-
     }
 }

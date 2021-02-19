@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CarForSale.Model;
+﻿using CarForSale.DataAccess;
+using CarForSale.Service;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace CarForSale
 {
@@ -30,6 +24,10 @@ namespace CarForSale
             services.AddDbContext<ApiDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddTransient<IFornecedorService, FornecedorService>();
+            services.AddTransient<IClienteService, ClienteService>();
+            services.AddTransient<IDataAccessDbContext, ApiDbContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

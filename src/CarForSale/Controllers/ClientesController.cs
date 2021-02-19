@@ -1,14 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using CarForSale.Model;
-using Newtonsoft.Json;
-using System.Net;
-using System.Reflection;
+using CarForSale.Service;
+using CarForSale.Service.Requests;
 
 namespace CarForSale.Controllers
 {
@@ -16,30 +9,30 @@ namespace CarForSale.Controllers
     [ApiController]
     public class ClientesController : ControllerBase
     {
-        private readonly ApiDbContext _context;
+        private readonly IClienteService service;
 
-        public ClientesController(ApiDbContext context)
+        public ClientesController(IClienteService service)
         {
-            _context = context;
+            this.service = service;
         }
 
         // GET: api/Clientes
         [HttpGet]
-        public IEnumerable<Cliente> Get()
+        public IActionResult Get([FromBody] ObterClienteRequest cliente)
         {
-            return _context.Clientes;
+            return Ok(service.Obter(cliente));
         }
 
         // GET: api/Clientes/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById([FromRoute] Guid id)
+        public IActionResult GetById([FromRoute] Guid id)
         {
-            if (!ModelState.IsValid)
+            if (id == Guid.Empty)
             {
                 return BadRequest(ModelState);
             }
 
-            var cliente = await _context.Clientes.FindAsync(id);
+            var cliente = service.Obter(id);
 
             if (cliente == null)
             {
@@ -51,125 +44,92 @@ namespace CarForSale.Controllers
 
         // PUT: api/Clientes/5
         [HttpPut]
-        public async Task<IActionResult> Put([FromBody] Cliente cliente)
+        public IActionResult Alterar([FromBody] AlterarClienteRequest request)
         {            
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (cliente.Id != cliente.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(cliente).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                return Ok(service.Alterar(request));
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if (!ClienteExists(cliente.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest(ex.Message);
             }
-
-            return NoContent();
         }       
 
         // POST: api/Clientes
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Cliente cliente)
+        public IActionResult Adicionar([FromBody] ClienteRequest request)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var clienteExistente = _context.Clientes.Any(c => c.Cpf == cliente.Cpf);
-                       
-            if(clienteExistente)
-            {               
-                return BadRequest(JsonConvert.SerializeObject(new { mensagem = "O CPF já está cadastrado." }));
-            }                       
-
-            _context.Clientes.Add(cliente);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetCliente", new { id = cliente.Id }, cliente);
+            return Ok(service.Adicionar(request));
         }
 
         // DELETE: api/Clientes/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete([FromRoute] Guid id)
+        public IActionResult Remover([FromRoute] Guid id)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var cliente = await _context.Clientes.FindAsync(id);
-            if (cliente == null)
-            {
-                return NotFound();
-            }
-
-            _context.Clientes.Remove(cliente);
-            await _context.SaveChangesAsync();
-
-            return Ok(cliente);
-        }
-
-        [HttpPatch]
-        public async Task<IActionResult> Patch([FromBody] ClientePatch clientePatch)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var cliente = await _context.Clientes.FindAsync(clientePatch.Id);
-            if (cliente == null)
-            {
-                return NotFound();
-            }
-
-            AtualizarDadosPorReflection(clientePatch, cliente);
-            await _context.SaveChangesAsync();
+            service.Remover(id);
 
             return Ok();
         }
 
-        private void AtualizarDadosPorReflection(ClientePatch clientePatch, Cliente cliente)
-        {
-            var clientePatchProperties = clientePatch.GetType().GetProperties().Where(x => x.Name != nameof(clientePatch.Id));
-            var clienteProperties = cliente.GetType().GetProperties();
+        //[HttpPatch]
+        //public async Task<IActionResult> Patch([FromBody] ClientePatch clientePatch)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
 
-            foreach (var property in clientePatchProperties)
-            {
-                var propertyValue = property.GetValue(clientePatch);
+        //    var cliente = await _context.Clientes.FindAsync(clientePatch.Id);
+        //    if (cliente == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-                if (propertyValue != null)
-                {                    
-                    var clienteProperty = clienteProperties.FirstOrDefault(x => x.Name == property.Name);
-                    if (clienteProperty != null)
-                    {
-                        clienteProperty.SetValue(cliente, propertyValue);
-                    }
-                }
-            }
-        }
+        //    AtualizarDadosPorReflection(clientePatch, cliente);
+        //    await _context.SaveChangesAsync();
 
-        private bool ClienteExists(Guid id)
-        {
-            return _context.Clientes.Any(e => e.Id == id);
-        }
+        //    return Ok();
+        //}
+
+        //private void AtualizarDadosPorReflection(ClientePatch clientePatch, Cliente cliente)
+        //{
+        //    var clientePatchProperties = clientePatch.GetType().GetProperties().Where(x => x.Name != nameof(clientePatch.Id));
+        //    var clienteProperties = cliente.GetType().GetProperties();
+
+        //    foreach (var property in clientePatchProperties)
+        //    {
+        //        var propertyValue = property.GetValue(clientePatch);
+
+        //        if (propertyValue != null)
+        //        {                    
+        //            var clienteProperty = clienteProperties.FirstOrDefault(x => x.Name == property.Name);
+        //            if (clienteProperty != null)
+        //            {
+        //                clienteProperty.SetValue(cliente, propertyValue);
+        //            }
+        //        }
+        //    }
+        //}
+
+        //private bool ClienteExists(Guid id)
+        //{
+        //    return _context.Clientes.Any(e => e.Id == id);
+        //}
     }
 }

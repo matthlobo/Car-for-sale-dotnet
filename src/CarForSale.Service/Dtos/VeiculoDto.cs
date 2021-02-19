@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace CarForSale.Model
+namespace CarForSale.Service.Dtos
 {
-    public abstract class Veiculo
+    public class VeiculoDto
     {
-        [Key]
         public Guid Id { get; set; }
-
         [Required(ErrorMessage = "O Campo {0} é obrigatório!")]
         public string Modelo { get; set; }
         [Required(ErrorMessage = "O Campo {0} é obrigatório!")]
@@ -18,7 +13,6 @@ namespace CarForSale.Model
         [Required(ErrorMessage = "O Campo {0} é obrigatório!")]
         public string Tipo { get; set; }
         [Required(ErrorMessage = "O Campo {0} é obrigatório!")]
-        public string Motor { get; set; }              
-        
+        public string Motor { get; set; }
     }
 }
