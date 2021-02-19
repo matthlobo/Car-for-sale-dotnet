@@ -18,7 +18,7 @@ namespace CarForSale.Controllers
 
         // GET: api/Clientes
         [HttpGet]
-        public IActionResult Get([FromBody] ObterClienteRequest cliente)
+        public IActionResult Get([FromQuery] ObterClienteRequest cliente)
         {
             return Ok(service.Obter(cliente));
         }
