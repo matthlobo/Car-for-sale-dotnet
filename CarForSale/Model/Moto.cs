@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CarForSale.Model
 {
-    public class Moto : AutomovelBase
+    public class Moto : Veiculo
     {
         [Required(ErrorMessage = "O número de cilindradas é obrigatório!")]
         public string Cilindradas { get; set; }

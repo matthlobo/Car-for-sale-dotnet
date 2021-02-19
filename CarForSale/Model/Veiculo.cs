@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CarForSale.Model
 {
-    public abstract class AutomovelBase
+    public abstract class Veiculo
     {
         [Key]
         public Guid Id { get; set; }
@@ -18,9 +18,7 @@ namespace CarForSale.Model
         [Required(ErrorMessage = "O Campo {0} é obrigatório!")]
         public string Tipo { get; set; }
         [Required(ErrorMessage = "O Campo {0} é obrigatório!")]
-        public string Motor { get; set; }
-        [Required(ErrorMessage = "O Campo {0} é obrigatório!")]
-        public string CodigoFornecedor { get; set; }
-        public virtual Fornecedor Fornecedor { get; set; }
+        public string Motor { get; set; }              
+        
     }
 }

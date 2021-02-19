@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CarForSale.Model
 {
-    public class Carro : AutomovelBase
+    public class Carro : Veiculo
     {
        [Required(ErrorMessage = "Você precisa informar a quantidade de litros do porta malas.")]
        public string LitrosPortaMalas { get; set; }

@@ -137,5 +137,42 @@ namespace CarForSale.Controllers
         {
             return _context.Fornecedores.Any(e => e.Id == id);
         }
+
+        
+        [HttpPost("{id}/carros")]
+        public async Task<IActionResult> PostCarros([FromRoute] Guid fornecedorId, [FromBody] Carro carro)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            //if (FornecedorVazio(fornecedor))
+            //    return BadRequest();
+            fornecedorId = new Guid("21429e0d-8253-43f6-2ded-08d8d4daace9");
+            var fornecedor = _context.Fornecedores.Find(fornecedorId);
+            fornecedor.Veiculos.Add(carro);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [HttpPost("{id}/motos")]
+        public async Task<IActionResult> PostMotos([FromRoute] Guid fornecedorId, [FromBody] Moto moto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            //if (FornecedorVazio(fornecedor))
+            //    return BadRequest();
+            fornecedorId = new Guid("21429e0d-8253-43f6-2ded-08d8d4daace9");
+            var fornecedor = _context.Fornecedores.Find(fornecedorId);
+            fornecedor.Veiculos.Add(moto);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
     }
 }

@@ -28,28 +28,28 @@ namespace CarForSale.Controllers
             return _context.Carros;
         }
 
-        [HttpGet("{CodigoFornecedor}")]
-        public async Task<IActionResult> GetCarrosAssociados([FromRoute] string CodigoFornecedor)        
-        {
-            //var carrosAssociados = _context.Carros.Where(c => c.Fornecedor.Codigo == c.CodigoFornecedor);
+        //[HttpGet("{CodigoFornecedor}")]
+        //public async Task<IActionResult> GetCarrosAssociados([FromRoute] string CodigoFornecedor)        
+        //{
+        //    //var carrosAssociados = _context.Carros.Where(c => c.Fornecedor.Codigo == c.CodigoFornecedor);
 
-            var carrosAssociados = _context.Carros;
-            var fornecedorAssociado =  _context.Fornecedores.Join(carrosAssociados,
-                f => f.Codigo,
-                c => c.CodigoFornecedor,
-                (f, c) => new
-                {
-                    modelo = c.Modelo,
-                    cor = c.Cor,
-                    tipo = c.Tipo,
-                    motor = c.Motor,
-                    NomeFornecedor = f.Nome,
-                    codigoFornecedor = f.Codigo
-                }).Where(c => c.codigoFornecedor == CodigoFornecedor);
+        //    var carrosAssociados = _context.Carros;
+        //    var fornecedorAssociado =  _context.Fornecedores.Join(carrosAssociados,
+        //        f => f.Codigo,
+        //        c => c.Fornecedor.Codigo,
+        //        (f, c) => new
+        //        {
+        //            modelo = c.Modelo,
+        //            cor = c.Cor,
+        //            tipo = c.Tipo,
+        //            motor = c.Motor,
+        //            NomeFornecedor = f.Nome,
+        //            codigoFornecedor = f.Codigo
+        //        }).Where(c => c.codigoFornecedor == CodigoFornecedor);
 
             
-            return Ok(fornecedorAssociado);
-        }
+        //    return Ok(fornecedorAssociado);
+        //}
 
         // GET: api/Carros/5
         [HttpGet("{id}")]

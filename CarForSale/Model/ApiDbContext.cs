@@ -23,15 +23,21 @@ namespace CarForSale.Model
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseLoggerFactory(loggerFactory)  //tie-up DbContext with LoggerFactory object
-                .EnableSensitiveDataLogging();                
+                .EnableSensitiveDataLogging();
         }
 
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //    modelBuilder.ApplyConfiguration(new AutomovelConfiguration());
+        //    base.OnModelCreating(modelBuilder);
+        //}
 
 
-        public DbSet<Fornecedor> Fornecedores { get; set; }
+        public DbSet<Fornecedor> Fornecedores { get; set; }   
         public DbSet<Carro> Carros { get; set; }
         public DbSet<Moto> Motos { get; set; }
         public DbSet<Cliente> Clientes { get; set; }
+        public DbSet<Pedidos> Pedidos { get; set; }
         
     }
 }
