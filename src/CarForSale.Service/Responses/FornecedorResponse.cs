@@ -8,6 +8,7 @@ namespace CarForSale.Service.Responses
     {
         public Guid Id { get; set; }
         public string Nome { get; set; }
-        public ICollection<VeiculoDto> Veiculos { get; set; }
+        public string Codigo { get; set; }
+        // public ICollection<VeiculoDto> Veiculos { get; set; }
     }
 }

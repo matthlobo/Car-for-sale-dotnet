@@ -4,6 +4,7 @@ using CarForSale.Service.Dtos;
 using CarForSale.Service.Extensions;
 using CarForSale.Service.Requests;
 using CarForSale.Service.Responses;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,48 +13,83 @@ namespace CarForSale.Service
 {
     public class FornecedorService : IFornecedorService
     {
-        private readonly IDataAccessDbContext context;
+        private readonly IFornecedorRepository fornecedorRepository;
 
-        public FornecedorService(IDataAccessDbContext context)
+        public CarroDto Carro { get; private set; }
+
+        public FornecedorService(IFornecedorRepository fornecedorRepository)
         {
-            this.context = context;
+            this.fornecedorRepository = fornecedorRepository;
         }
 
-        public FornecedorResponse ObterPor(Guid id)
+        public FornecedorResponse Obter(Guid id)
         {
-            var fornecedor = this.context.Fornecedores.Find(id);
+            var fornecedor = fornecedorRepository.Obter(id);
             return fornecedor.ToResponse();
         }
 
-        public IEnumerable<FornecedorResponse> ObterPor(string nome)
+
+        //public IEnumerable<FornecedorResponse> Obter(ObterFornecedorRequest fornecedor)
+        //{
+        //    var fornecedores = fornecedor == null || string.IsNullOrWhiteSpace(fornecedor.Nome)
+        //        // Entity Framework por default, é lazy load, ou seja só traz o mínimo necessário
+        //        // Se quiser que ele retorne as tabelas associadas, utilize Include e ThenInclude pra tabela dentro da tabela
+        //        // Tabela fornecedores incluindo tabela veículos
+        //        ? fornecedorRepository.Obter(fornecedor.Nome)
+        //        ? this.context.Fornecedores.Include(x => x.Veiculos).ToList()
+        //        : this.context.Fornecedores.Where(x => x.Nome.Contains(fornecedor.Nome)).ToList();
+
+        //    return fornecedores.Select(x => x.ToResponse()).ToList();
+        //}
+
+        public IEnumerable<FornecedorResponse> Obter(ObterFornecedorRequest fornecedor)
         {
-            var fornecedores = this.context.Fornecedores.Where(x => x.Nome.Contains(nome));
-            return fornecedores.Select(fornecedor => fornecedor.ToResponse()).ToList();
+            throw new NotImplementedException();
         }
 
         public IEnumerable<FornecedorResponse> ObterTodos()
         {
-            return this.context.Fornecedores.Select(fornecedor => fornecedor.ToResponse()).ToList();
+            var fornecedores = fornecedorRepository.ObterTodos();
+            return fornecedores.Select(x => x.ToResponse()).ToList();
         }
 
-        public FornecedorResponse Alterar(FornecedorRequest request)
+        public FornecedorResponse Adicionar(FornecedorRequest request)
         {
-            var fornecedor = this.context.Fornecedores.Find(request.Id);
+            var fornecedor = request.ToEntity();
+            fornecedorRepository.Adicionar(fornecedor);
+            // FornecedorExtensions.ToResponse(fornecedor);
+            return fornecedor.ToResponse();
+        }
 
-            if (fornecedor == null)
-                throw new ArgumentException($"O fornecedor com id {request.Id} não foi encontrado.");
-
-            
-            AlterarVeiculos(request.Veiculos, fornecedor);
-            AdicionarVeiculos(request.Veiculos, fornecedor);
-            RemoverVeiculos(request.Veiculos, fornecedor);
-
-            this.context.SaveChanges();
+        public FornecedorResponse Alterar(AlterarFornecedorRequest request)
+        {
+            var fornecedor = request.ToEntity();
+            fornecedorRepository.Editar(fornecedor);
 
             return fornecedor.ToResponse();
         }
 
-        private void AlterarVeiculos(ICollection<VeiculoDto> veiculos, Fornecedor fornecedor)
+        public void Remover(Guid id)
+        {
+            var fornecedor = fornecedorRepository.Obter(id);
+
+            if (fornecedor == null)
+                throw new ArgumentException($"O cliente com id {id} não foi encontrado.");
+
+            fornecedorRepository.Deletar(id);
+        }
+
+        public IEnumerable<VeiculoDto> ObterVeiculos(Guid fornecedorId)
+        {
+           var fornecedor = fornecedorRepository.ObterComVeiculos(fornecedorId);
+            
+            if (fornecedor == null)
+                throw new ArgumentException($"O cliente com id {fornecedorId} não foi encontrado.");
+
+            return fornecedor.Veiculos.ToDtos();
+        }
+
+        public void AlterarVeiculos(ICollection<VeiculoDto> veiculos, Fornecedor fornecedor)
         {
             var veiculoIds = fornecedor.Veiculos.Select(x => x.Id).ToList();
             var veiculosParaAlterar = veiculos.Where(x => veiculoIds.Contains(x.Id));
@@ -64,13 +100,17 @@ namespace CarForSale.Service
                 veiculo.Cor = item.Cor;
                 veiculo.Modelo = item.Modelo;
                 veiculo.Motor = item.Motor;
-                veiculo.Tipo = item.Tipo;
-
-                //TODO: Adicionar as propriedades de carro/moto
+                veiculo.Tipo = item.Tipo;            
             }
         }
+        public VeiculoResponse AdicionarVeiculo(Guid fornecedorId, VeiculoRequest request)
+        {
+            var veiculoEntity = request.ToEntity();          
+            fornecedorRepository.AdicionarVeiculos(fornecedorId, veiculoEntity);
+            return veiculoEntity.ToResponse();            
+        }
 
-        private void AdicionarVeiculos(ICollection<VeiculoDto> veiculos, Fornecedor fornecedor)
+        public void AdicionarVeiculo(ICollection<VeiculoDto> veiculos, Fornecedor fornecedor)
         {
             var veiculoIds = fornecedor.Veiculos.Select(x => x.Id).ToList();
             var veiculosParaAdicionar = veiculos.Where(x => !veiculoIds.Contains(x.Id));
@@ -92,15 +132,6 @@ namespace CarForSale.Service
             }            
         }
 
-        public void Remover(Guid id)
-        {
-            var fornecedor = this.context.Fornecedores.Find(id);
-
-            if (fornecedor == null)
-                throw new ArgumentException($"O fornecedor com id {id} não foi encontrado.");
-
-            this.context.Fornecedores.Remove(fornecedor);
-            this.context.SaveChanges();
-        }
+        
     }
 }

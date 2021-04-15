@@ -8,6 +8,7 @@ namespace CarForSale.DataAccess
         DbSet<Fornecedor> Fornecedores { get; set; }
         DbSet<Carro> Carros { get; set; }
         DbSet<Moto> Motos { get; set; }
+        DbSet<Veiculo> Veiculos { get; set; }
         DbSet<Cliente> Clientes { get; set; }
         DbSet<Pedido> Pedidos { get; set; }
         int SaveChanges();

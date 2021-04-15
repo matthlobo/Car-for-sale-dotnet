@@ -11,5 +11,10 @@ namespace CarForSale.DataAccess.Entities
         public string Nome { get; set; }
         public string Codigo { get; set; }
         public ICollection<Veiculo> Veiculos { get; set; }
+
+        public Fornecedor()
+        {
+            Veiculos = new List<Veiculo>();
+        }
     }
 }

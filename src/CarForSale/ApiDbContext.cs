@@ -21,5 +21,6 @@ namespace CarForSale
         public DbSet<Moto> Motos { get; set; }
         public DbSet<Cliente> Clientes { get; set; }
         public DbSet<Pedido> Pedidos { get; set; }
+        public DbSet<Veiculo> Veiculos { get; set; }
     }
 }

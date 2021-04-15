@@ -7,10 +7,12 @@ namespace CarForSale.DataAccess.Entities
     {
         [Key]
         public Guid Id { get; set; }
-
         public string Modelo { get; set; }
         public string Cor { get; set; }
         public string Tipo { get; set; }
         public string Motor { get; set; }
+        public string Discriminator { get; set; }
+
+        // public string FornecedorId { get; set; }
     }
 }

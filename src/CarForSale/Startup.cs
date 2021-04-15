@@ -26,10 +26,14 @@ namespace CarForSale
             services.AddDbContext<ApiDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            
+            services.AddTransient<IFornecedorRepository, FornecedorRepository>();
 
             services.AddTransient<IFornecedorService, FornecedorService>();
             services.AddTransient<IClienteService, ClienteService>();
             services.AddTransient<IDataAccessDbContext, ApiDbContext>();
+
+            
 
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>

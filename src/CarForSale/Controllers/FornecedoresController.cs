@@ -1,178 +1,123 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Threading.Tasks;
-//using Microsoft.AspNetCore.Http;
-//using Microsoft.AspNetCore.Mvc;
-//using Microsoft.EntityFrameworkCore;
-//using CarForSale.DataAccess.Entities;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
+using CarForSale.Service;
+using CarForSale.Service.Requests;
+using CarForSale.Service.Dtos;
+using CarForSale.DataAccess.Entities;
 
-//namespace CarForSale.Controllers
-//{
-//    [Route("api/[controller]")]
-//    [ApiController]
-//    public class FornecedoresController : ControllerBase
-//    {
-//        private readonly ApiDbContext _context;
+namespace CarForSale.Controllers
+{
+   [Route("api/[controller]")]
+   [ApiController]
+   public class FornecedoresController : ControllerBase
+   {
+       private readonly IFornecedorService service;
 
-//        public FornecedoresController(ApiDbContext context)
-//        {
-//            _context = context;
-//        }
+       public FornecedoresController(IFornecedorService service)
+       {
+           this.service = service;
+       }
 
         
-//        [HttpGet]
-//        public IEnumerable<Fornecedor> GetFornecedores()
-//        {
-//            return _context.Fornecedores;
-//        }
+       [HttpGet]
+        public IActionResult Get()
+        {
+            return Ok(service.ObterTodos());
+        }
 
-//        [HttpGet("{id}")]
-//        public async Task<IActionResult> GetFornecedor([FromRoute] Guid id)
-//        {
-//            if (!ModelState.IsValid)
-//            {
-//                return BadRequest(ModelState);
-//            }
+        [HttpGet("{fornecedorId}")]
+        public IActionResult GetById([FromRoute] Guid fornecedorId)
+        {
+            if (fornecedorId == Guid.Empty)
+            {
+                return BadRequest(ModelState);
+            }
 
-//            var fornecedor = await _context.Fornecedores.FindAsync(id);
+            var fornecedor = service.Obter(fornecedorId);
 
-//            if (fornecedor == null)
-//            {
-//                return NotFound();
-//            }
+            if (fornecedor == null)
+            {
+                return NotFound();
+            }
 
-//            return Ok(fornecedor);
-//        }
+            return Ok(fornecedor);
+        }
 
-        
-//        [HttpPut("{id}")]
-//        public async Task<IActionResult> PutFornecedor([FromRoute] Guid id, [FromBody] Fornecedor fornecedor)
-//        {
-//            if (!ModelState.IsValid)
-//            {
-//                return BadRequest(ModelState);
-//            }
+        [HttpPost]
+        public IActionResult Adicionar([FromBody] FornecedorRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-//            if (id != fornecedor.Id)
-//            {
-//                return BadRequest();
-//            }
+            return Ok(service.Adicionar(request));
+        }
 
-//            if (FornecedorVazio(fornecedor))
-//                return BadRequest();
 
-//            _context.Entry(fornecedor).State = EntityState.Modified;
+        [HttpPut("{fornecedorId}")]
+        public IActionResult Alterar([FromRoute] Guid fornecedorId, [FromBody] AlterarFornecedorRequest request)
+        {
+            request.Id = fornecedorId;
 
-//            try
-//            {
-//                await _context.SaveChangesAsync();
-//            }
-//            catch (DbUpdateConcurrencyException)
-//            {
-//                if (!FornecedorExists(id))
-//                {
-//                    return NotFound();
-//                }
-//                else
-//                {
-//                    throw;
-//                }
-//            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-//            return NoContent();
-//        }
-
+            try
+            {
+                return Ok(service.Alterar(request));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
        
-//        [HttpPost]
-//        public async Task<IActionResult> PostFornecedor([FromBody] Fornecedor fornecedor)
-//        {
-//            if (!ModelState.IsValid)
-//            {
-//                return BadRequest(ModelState);
-//            }
-
-//            if (FornecedorVazio(fornecedor))
-//                return BadRequest();
-
-//            _context.Fornecedores.Add(fornecedor);
-//            await _context.SaveChangesAsync();
-
-//            return CreatedAtAction("GetFornecedor", new { id = fornecedor.Id }, fornecedor);
-//        }
-
         
-//        [HttpDelete("{id}")]
-//        public async Task<IActionResult> DeleteFornecedor([FromRoute] Guid id)
-//        {
-//            if (!ModelState.IsValid)
-//            {
-//                return BadRequest(ModelState);
-//            }
+       [HttpDelete("{fornecedorId}")]
+       public IActionResult Remover([FromRoute] Guid fornecedorId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-//            var fornecedor = await _context.Fornecedores.FindAsync(id);
-//            if (fornecedor == null)
-//            {
-//                return NotFound();
-//            }
+            service.Remover(fornecedorId);
 
-//            _context.Fornecedores.Remove(fornecedor);
-//            await _context.SaveChangesAsync();
+            return Ok();
+        }
 
-//            return Ok(fornecedor);
-//        }
+        [HttpGet("{fornecedorId}/veiculos")]
+        public IActionResult GetVeiculos([FromRoute] Guid fornecedorId)
+        {
+            return Ok(service.ObterVeiculos(fornecedorId));
+        }
 
-//        private bool FornecedorVazio(Fornecedor fornecedor)
-//        {
-//            if (fornecedor.Nome == null || fornecedor.Codigo == null)
-//                return true;
+        [HttpGet("{fornecedorId}/veiculos/{veiculoId}")]
+        public IActionResult GetVeiculoById([FromRoute] Guid fornecedorId, [FromRoute] Guid veiculoId)
+        {
+            return Ok();
+        }
 
-//            if (fornecedor.Nome == "" || fornecedor.Codigo == "")
-//                return true;
-            
-//            return false;
-//        }
+        [HttpPost("{fornecedorId}/veiculos")]
+        public IActionResult PostVeiculo([FromRoute] Guid fornecedorId, [FromBody] VeiculoRequest veiculo)
+        {            
+            return Ok(service.AdicionarVeiculo(fornecedorId, veiculo));
+        }
 
-//        private bool FornecedorExists(Guid id)
-//        {
-//            return _context.Fornecedores.Any(e => e.Id == id);
-//        }
+        [HttpPut("{fornecedorId}/veiculos/{veiculoId}")]
+        public IActionResult PutVeiculo([FromRoute] Guid fornecedorId, [FromRoute] Guid veiculoId, [FromBody] VeiculoRequest veiculo)
+        {
+            return Ok();
+        }
 
-        
-//        [HttpPost("{id}/carros")]
-//        public async Task<IActionResult> PostCarros([FromRoute] Guid fornecedorId, [FromBody] Carro carro)
-//        {
-//            if (!ModelState.IsValid)
-//            {
-//                return BadRequest(ModelState);
-//            }
+        [HttpDelete("{fornecedorId}/veiculos/{veiculoId}")]
+        public IActionResult RemoveVeiculo([FromRoute] Guid fornecedorId, [FromRoute] Guid veiculoId)
+        {
+            return Ok();
+        }
 
-//            //if (FornecedorVazio(fornecedor))
-//            //    return BadRequest();
-//            fornecedorId = new Guid("21429e0d-8253-43f6-2ded-08d8d4daace9");
-//            var fornecedor = _context.Fornecedores.Find(fornecedorId);
-//            fornecedor.Veiculos.Add(carro);
-//            await _context.SaveChangesAsync();
-
-//            return Ok();
-//        }
-
-//        [HttpPost("{id}/motos")]
-//        public async Task<IActionResult> PostMotos([FromRoute] Guid fornecedorId, [FromBody] Moto moto)
-//        {
-//            if (!ModelState.IsValid)
-//            {
-//                return BadRequest(ModelState);
-//            }
-
-//            //if (FornecedorVazio(fornecedor))
-//            //    return BadRequest();
-//            fornecedorId = new Guid("21429e0d-8253-43f6-2ded-08d8d4daace9");
-//            var fornecedor = _context.Fornecedores.Find(fornecedorId);
-//            fornecedor.Veiculos.Add(moto);
-//            await _context.SaveChangesAsync();
-
-//            return Ok();
-//        }
-//    }
-//}
+    }
+}

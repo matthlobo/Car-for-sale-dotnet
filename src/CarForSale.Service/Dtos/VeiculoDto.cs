@@ -14,5 +14,8 @@ namespace CarForSale.Service.Dtos
         public string Tipo { get; set; }
         [Required(ErrorMessage = "O Campo {0} é obrigatório!")]
         public string Motor { get; set; }
+        public string TipoVeiculo { get; set; }
+        public string Discriminator { get; set; }
+
     }
 }
