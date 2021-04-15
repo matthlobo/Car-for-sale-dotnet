@@ -1,6 +1,5 @@
 ﻿using CarForSale.Service.Dtos;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace CarForSale.Service.Requests
@@ -18,7 +17,5 @@ namespace CarForSale.Service.Requests
         public TipoVeiculo TipoVeiculo { get; set; }
         public string LitrosPortaMalas { get; set; }
         public string Cilindradas { get; set; }
-
-
     }
 }

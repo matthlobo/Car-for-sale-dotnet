@@ -11,7 +11,7 @@ namespace CarForSale.DataAccess
     {
         private readonly IDataAccessDbContext context;
         public FornecedorRepository(IDataAccessDbContext context)
-        {           
+        {
             this.context = context;
         }
 
@@ -56,28 +56,59 @@ namespace CarForSale.DataAccess
 
         public void Deletar(Guid id)
         {
-            if(id != Guid.Empty)
-            {
-                var fornecedor = context.Fornecedores.Find(id);
-                context.Fornecedores.Remove(fornecedor);
-                context.SaveChanges();
-            }
-            else
-            {
-                throw new ArgumentException();
-            }
+            var fornecedor = context.Fornecedores.Find(id);
+
+            if (fornecedor == null)
+                throw new ArgumentException($"O fornecedor com id {id} não foi encontrado.");
+
+            context.Fornecedores.Remove(fornecedor);
+            context.SaveChanges();
         }
 
         public void AdicionarVeiculos(Guid fornecedorId, Veiculo veiculo)
         {
-            if(veiculo == null)
+            if (veiculo == null)
                 throw new ArgumentException($"O veiculo Não chegou aqui.");
-            
+
             var fornecedor = context.Fornecedores.Find(fornecedorId);
             fornecedor.Veiculos.Add(veiculo);
             context.SaveChanges();
         }
 
+        public void AlterarVeiculo(Guid fornecedorId, Guid veiculoId, Veiculo veiculo)
+        {
+            var fornecedor = this.ObterComVeiculos(fornecedorId);
 
+            if (fornecedor == null)
+                throw new ArgumentException($"O fornecedor com id {fornecedorId} não foi encontrado.");
+
+            var veiculoParaAlterar = fornecedor.Veiculos.FirstOrDefault(x => x.Id == veiculoId);
+
+            if (veiculoParaAlterar == null)
+                throw new ArgumentException($"O veiculo com id {veiculoId} não foi encontrado no fornecedor {fornecedorId}.");
+
+            veiculoParaAlterar.Modelo = veiculo.Modelo;
+            veiculoParaAlterar.Cor = veiculo.Cor;
+            veiculoParaAlterar.Tipo = veiculo.Tipo;
+            veiculoParaAlterar.Motor = veiculo.Motor;
+
+            this.context.SaveChanges();
+        }
+
+        public void RemoverVeiculo(Guid fornecedorId, Guid veiculoId)
+        {
+            var fornecedor = this.ObterComVeiculos(fornecedorId);
+
+            if (fornecedor == null)
+                throw new ArgumentException($"O fornecedor com id {fornecedorId} não foi encontrado.");
+
+            var veiculo = fornecedor.Veiculos.FirstOrDefault(x => x.Id == veiculoId);
+
+            if (veiculo == null)
+                throw new ArgumentException($"O veiculo com id {veiculoId} não foi encontrado no fornecedor {fornecedorId}.");
+
+            fornecedor.Veiculos.Remove(veiculo);
+            this.context.SaveChanges();
+        }
     }
 }

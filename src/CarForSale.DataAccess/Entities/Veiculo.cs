@@ -11,8 +11,5 @@ namespace CarForSale.DataAccess.Entities
         public string Cor { get; set; }
         public string Tipo { get; set; }
         public string Motor { get; set; }
-        public string Discriminator { get; set; }
-
-        // public string FornecedorId { get; set; }
     }
 }

@@ -2,12 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using CarForSale.Service;
 using CarForSale.Service.Requests;
-using CarForSale.Service.Dtos;
-using CarForSale.DataAccess.Entities;
 
 namespace CarForSale.Controllers
 {
-   [Route("api/[controller]")]
+    [Route("api/[controller]")]
    [ApiController]
    public class FornecedoresController : ControllerBase
    {
@@ -98,24 +96,26 @@ namespace CarForSale.Controllers
         [HttpGet("{fornecedorId}/veiculos/{veiculoId}")]
         public IActionResult GetVeiculoById([FromRoute] Guid fornecedorId, [FromRoute] Guid veiculoId)
         {
-            return Ok();
+            return Ok(service.ObterVeiculo(fornecedorId, veiculoId));
         }
 
         [HttpPost("{fornecedorId}/veiculos")]
-        public IActionResult PostVeiculo([FromRoute] Guid fornecedorId, [FromBody] VeiculoRequest veiculo)
-        {            
-            return Ok(service.AdicionarVeiculo(fornecedorId, veiculo));
+        public IActionResult PostVeiculo([FromRoute] Guid fornecedorId, [FromBody] VeiculoRequest request)
+        {
+            var veiculo = service.AdicionarVeiculo(fornecedorId, request);
+            return CreatedAtAction(nameof(GetVeiculoById), new { fornecedorId = fornecedorId, veiculoId = veiculo.Id }, veiculo);
         }
 
         [HttpPut("{fornecedorId}/veiculos/{veiculoId}")]
-        public IActionResult PutVeiculo([FromRoute] Guid fornecedorId, [FromRoute] Guid veiculoId, [FromBody] VeiculoRequest veiculo)
+        public IActionResult PutVeiculo([FromRoute] Guid fornecedorId, [FromRoute] Guid veiculoId, [FromBody] VeiculoRequest request)
         {
-            return Ok();
+            return Ok(service.AlterarVeiculo(fornecedorId,veiculoId, request));
         }
 
         [HttpDelete("{fornecedorId}/veiculos/{veiculoId}")]
         public IActionResult RemoveVeiculo([FromRoute] Guid fornecedorId, [FromRoute] Guid veiculoId)
         {
+            service.RemoverVeiculo(fornecedorId, veiculoId);
             return Ok();
         }
 

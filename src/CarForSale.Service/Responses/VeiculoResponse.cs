@@ -12,10 +12,7 @@ namespace CarForSale.Service.Responses
         public string Tipo { get; set; }
         public string Motor { get; set; }
         public TipoVeiculo TipoVeiculo { get; set; }
-        public string FornecedorId { get; set; }
         public string LitrosPortaMalas { get; set; }
         public string Cilindradas { get; set; }
-
-                
     }
 }

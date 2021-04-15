@@ -14,7 +14,9 @@ namespace CarForSale
 
         public ApiDbContext(DbContextOptions options) 
             : base(options)
-        { }
+        {
+            Database.EnsureCreated();
+        }
 
         public DbSet<Fornecedor> Fornecedores { get; set; }
         public DbSet<Carro> Carros { get; set; }

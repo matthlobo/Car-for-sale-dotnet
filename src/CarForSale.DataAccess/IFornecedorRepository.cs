@@ -15,5 +15,7 @@ namespace CarForSale.DataAccess
         IEnumerable<Fornecedor> ObterTodos();
         void Deletar(Guid id);
         void AdicionarVeiculos(Guid fornecedorId, Veiculo veiculo);
+        void RemoverVeiculo(Guid fornecedorId, Guid veiculoId);
+        void AlterarVeiculo(Guid fornecedorId, Guid veiculoId, Veiculo veiculoEntity);
     }
 }
