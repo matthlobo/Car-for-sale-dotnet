@@ -1,6 +1,7 @@
 ﻿using CarForSale.DataAccess;
 using CarForSale.Service;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -57,6 +58,22 @@ namespace CarForSale
                     }
                 });
             });
+
+
+            // ********************
+            // Setup CORS
+            // ********************
+            var corsBuilder = new CorsPolicyBuilder();
+            corsBuilder.AllowAnyHeader();
+            corsBuilder.AllowAnyMethod();
+            corsBuilder.AllowAnyOrigin(); // For anyone access.
+            //corsBuilder.WithOrigins("http://localhost:56573"); // for a specific url. Don't add a forward slash on the end!
+            corsBuilder.AllowCredentials();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("SiteCorsPolicy", corsBuilder.Build());
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -71,7 +88,7 @@ namespace CarForSale
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Car for sale - V1");
                 c.RoutePrefix = string.Empty;
-            });
+            });                  
 
             if (env.IsDevelopment())
             {
@@ -82,6 +99,10 @@ namespace CarForSale
                 app.UseHsts();
             }
 
+            // ********************
+            // USE CORS - might not be required.
+            // ********************
+            app.UseCors("SiteCorsPolicy");
             app.UseHttpsRedirection();
             app.UseMvc();
         }
